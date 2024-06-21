@@ -11,21 +11,19 @@ Antes de iniciar, certifique-se de ter os seguintes requisitos instalados:
 - Node.js (para o frontend Vue.js)
 - npm
 
-1. **Clonar o repositório**
-
-   ```bash
+## Clonar o repositório**
    git clone https://github.com/seu-usuario/seu-projeto.git
    cd seu-projeto
 
-2. **Instalar as dependências
+## Instalar as dependências
 
 composer install
 npm install # ou yarn install
 
-3. **Configuração do ambiente
+## Configuração do ambiente
 - cp .env.example .env
   
-4. **Configure o acesso ao banco de dados no arquivo .env:
+## Configure o acesso ao banco de dados no arquivo .env:
   -DB_CONNECTION=mysql
   -DB_HOST=127.0.0.1
   -DB_PORT=3306
@@ -33,23 +31,24 @@ npm install # ou yarn install
   -DB_USERNAME=seu_usuario
   -DB_PASSWORD=sua_senha
    
-5. **Executar as migrations e seeds
+## Executar as migrations e seeds
 
 -php artisan migrate
 
-Se desejar, também pode-se popular o banco de dados com dados de exemplo (opcional):
+## Se desejar, também pode-se popular o banco de dados com dados de exemplo (opcional):
 
 -php artisan db:seed
 
-6. **Compilar os assets
+## Compilar os assets
 
 -npm run dev
 
-7. **Iniciar o servidor de desenvolvimento
+## Iniciar o servidor de desenvolvimento
    
 -php artisan serve
 
-Funcionalidades
+## Funcionalidades
+
 Interface responsiva e intuitiva usando Vue.js.
 Gerenciamento completo de tarefas: criar, listar, editar, excluir e marcar como concluídas.
 Atribuir tarefas a membros.
