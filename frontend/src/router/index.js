@@ -5,10 +5,10 @@ import TaskDetail from '../views/TaskDetail.vue'
 import Auth from '../views/Auth.vue'
 
 const routes = [
-  { path: '/', name: 'Home', component: Home },
+  { path: '/home', name: 'Home', component: Home },
   { path: '/tasks', name: 'TaskList', component: TaskList },
   { path: '/tasks/:id', name: 'TaskDetail', component: TaskDetail, props: true },
-  { path: '/auth', name: 'Auth', component: Auth }
+  { path: '/', name: 'Auth', component: Auth }
 ]
 
 const router = createRouter({
