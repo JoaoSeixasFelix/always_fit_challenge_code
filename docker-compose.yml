@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────────
+  # MySQL 8.0
+  # ─────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: always_fit_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: always_fit_db
+      MYSQL_USER: always_fit
+      MYSQL_PASSWORD: always
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - always_fit_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ualways_fit", "-palways"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ─────────────────────────────────────────────
+  # Backend Laravel 11 (PHP 8.3-cli)
+  # ─────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: always_fit_backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: always_fit_db
+      DB_USERNAME: always_fit
+      DB_PASSWORD: always
+    volumes:
+      # Hot reload: monta o código-fonte do host
+      - ./backend:/var/www/html
+      # Preserva vendor gerado no build (evita sobrescrever com host vazio)
+      - backend_vendor:/var/www/html/vendor
+      # Preserva cache do bootstrap
+      - backend_cache:/var/www/html/bootstrap/cache
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - always_fit_network
+
+  # ─────────────────────────────────────────────
+  # Frontend Vue 3 + Vite
+  # ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: always_fit_frontend
+    restart: unless-stopped
+    volumes:
+      # Hot reload: monta o código-fonte do host
+      - ./frontend:/app
+      # Preserva node_modules gerado no build
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - always_fit_network
+
+# ─────────────────────────────────────────────
+# Volumes nomeados
+# ─────────────────────────────────────────────
+volumes:
+  db_data:
+  backend_vendor:
+  backend_cache:
+  frontend_node_modules:
+
+# ─────────────────────────────────────────────
+# Rede interna
+# ─────────────────────────────────────────────
+networks:
+  always_fit_network:
+    driver: bridge
