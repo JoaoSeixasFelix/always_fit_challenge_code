@@ -69,8 +69,10 @@ export default {
           password: this.password
         });
 
-        if (response.data.success) {
-          // Login bem-sucedido, redirecionar para a página inicial
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+          this.$router.push('/home');
+        } else if (response.data.success) {
           this.$router.push('/home');
         } else {
           this.error = response.data.message || 'Erro desconhecido ao tentar fazer login.';
