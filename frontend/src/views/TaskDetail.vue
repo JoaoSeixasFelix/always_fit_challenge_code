@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import api from '../config/api';
+
 export default {
     props: ['id'],
     data() {
@@ -26,12 +28,20 @@ export default {
         this.fetchTask()
     },
     methods: {
-        fetchTask() {
-            // Lógica para buscar os detalhes da tarefa do backend
-            this.task = { id: this.id, title: 'Tarefa Exemplo', description: 'Descrição da tarefa exemplo' }
+        async fetchTask() {
+            try {
+                const response = await api.get('/tasks/' + this.id);
+                this.task = response.data;
+            } catch (error) {
+                // manter task como null em caso de erro
+            }
         },
-        markAsCompleted() {
-            // Lógica para marcar a tarefa como concluída
+        async markAsCompleted() {
+            try {
+                await api.put('/tasks/' + this.id, { status: 'completed' });
+            } catch (error) {
+                // manter estado atual em caso de erro
+            }
         }
     }
 }

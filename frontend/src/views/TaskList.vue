@@ -40,27 +40,39 @@
 </template>
 
 <script>
+import api from '../config/api';
+
 export default {
     data() {
         return {
-            tasks: [
-                { id: 1, title: 'Tarefa 1', description: 'Descrição da tarefa 1' },
-                { id: 2, title: 'Tarefa 2', description: 'Descrição da tarefa 2' }
-            ]
+            tasks: []
         };
     },
+    mounted() {
+        this.fetchTasks();
+    },
     methods: {
+        async fetchTasks() {
+            try {
+                const response = await api.get('/tasks');
+                this.tasks = response.data;
+            } catch (error) {
+                // manter tasks vazio em caso de erro
+            }
+        },
         createTask() {
-            // Implementar lógica para criar uma nova tarefa
-            console.log('Criar nova tarefa');
+            this.$router.push('/tasks/create');
         },
         editTask(taskId) {
-            // Implementar lógica para editar a tarefa com o ID taskId
-            console.log('Editar tarefa com ID:', taskId);
+            this.$router.push('/tasks/' + taskId + '/edit');
         },
-        deleteTask(taskId) {
-            // Implementar lógica para excluir a tarefa com o ID taskId
-            console.log('Excluir tarefa com ID:', taskId);
+        async deleteTask(taskId) {
+            try {
+                await api.delete('/tasks/' + taskId);
+                this.tasks = this.tasks.filter(task => task.id !== taskId);
+            } catch (error) {
+                // manter lista atual em caso de erro
+            }
         }
     }
 };

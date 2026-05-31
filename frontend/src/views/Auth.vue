@@ -71,6 +71,7 @@ export default {
 
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
+          window.dispatchEvent(new Event('auth-changed'))
           this.$router.push('/home');
         } else if (response.data.success) {
           this.$router.push('/home');

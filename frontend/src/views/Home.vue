@@ -56,13 +56,12 @@
   </template>
   
   <script>
+  import api from '../config/api';
+
   export default {
     data() {
       return {
-        tasks: [
-          { id: 1, title: 'Tarefa 1', description: 'Descrição da tarefa 1' },
-          { id: 2, title: 'Tarefa 2', description: 'Descrição da tarefa 2' }
-        ],
+        tasks: [],
         newTask: {
           title: '',
           description: ''
@@ -70,28 +69,43 @@
         showForm: false
       };
     },
+    mounted() {
+      this.fetchTasks();
+    },
     methods: {
-      addTask() {
-        // Simular adição de tarefa (implemente a lógica real conforme necessário)
-        this.tasks.push({
-          id: this.tasks.length + 1,
-          title: this.newTask.title,
-          description: this.newTask.description
-        });
-        // Limpar campos do formulário
-        this.newTask.title = '';
-        this.newTask.description = '';
-        // Fechar o formulário após adicionar a tarefa
-        this.showForm = false;
+      async fetchTasks() {
+        try {
+          const response = await api.get('/tasks');
+          this.tasks = response.data;
+        } catch (error) {
+          // manter tasks vazio em caso de erro
+        }
+      },
+      async addTask() {
+        try {
+          const response = await api.post('/tasks', {
+            title: this.newTask.title,
+            description: this.newTask.description,
+            status: 'pending'
+          });
+          this.tasks.push(response.data);
+          this.newTask.title = '';
+          this.newTask.description = '';
+          this.showForm = false;
+        } catch (error) {
+          // manter estado atual em caso de erro
+        }
       },
       editTask(task) {
-        // Implementar lógica para editar a tarefa
-        console.log('Editar tarefa:', task);
+        this.$router.push('/tasks/' + task.id + '/edit');
       },
-      deleteTask(taskId) {
-        // Implementar lógica para excluir a tarefa com o ID taskId
-        console.log('Excluir tarefa com ID:', taskId);
-        this.tasks = this.tasks.filter(task => task.id !== taskId);
+      async deleteTask(taskId) {
+        try {
+          await api.delete('/tasks/' + taskId);
+          this.tasks = this.tasks.filter(task => task.id !== taskId);
+        } catch (error) {
+          // manter lista atual em caso de erro
+        }
       }
     }
   };

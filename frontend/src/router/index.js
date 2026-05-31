@@ -16,4 +16,21 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  const publicRoutes = ['/']
+  const isAuthenticated = !!localStorage.getItem('token')
+
+  if (!publicRoutes.includes(to.path) && !isAuthenticated) {
+    next('/')
+  } else {
+    next()
+  }
+})
+
+router.afterEach((to) => {
+  if (to.path === '/' && !!localStorage.getItem('token')) {
+    router.push('/home').catch(() => {})
+  }
+})
+
 export default router

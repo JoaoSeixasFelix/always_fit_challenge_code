@@ -10,9 +10,9 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(config => {
-  const token = document.head.querySelector('meta[name="csrf-token"]');
-  if (token) {
-    config.headers['X-CSRF-TOKEN'] = token.content;
+  const jwtToken = localStorage.getItem('token');
+  if (jwtToken) {
+    config.headers['Authorization'] = 'Bearer ' + jwtToken;
   }
   return config;
 }, error => {
