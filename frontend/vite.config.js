@@ -6,5 +6,9 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 3000 // Especifique a porta que você deseja usar
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true
   }
 })

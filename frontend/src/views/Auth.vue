@@ -71,7 +71,7 @@ export default {
 
         if (response.data.success) {
           // Login bem-sucedido, redirecionar para a página inicial
-          this.$router.push('/dashboard'); // Exemplo de redirecionamento após login
+          this.$router.push('/home');
         } else {
           this.error = response.data.message || 'Erro desconhecido ao tentar fazer login.';
         }
