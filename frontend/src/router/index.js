@@ -2,11 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import TaskList from '../views/TaskList.vue'
 import TaskDetail from '../views/TaskDetail.vue'
+import TaskForm from '../views/TaskForm.vue'
 import Auth from '../views/Auth.vue'
 
 const routes = [
   { path: '/home', name: 'Home', component: Home },
   { path: '/tasks', name: 'TaskList', component: TaskList },
+  { path: '/tasks/create', name: 'TaskCreate', component: TaskForm },
+  { path: '/tasks/:id/edit', name: 'TaskEdit', component: TaskForm, props: true },
   { path: '/tasks/:id', name: 'TaskDetail', component: TaskDetail, props: true },
   { path: '/', name: 'Auth', component: Auth }
 ]
