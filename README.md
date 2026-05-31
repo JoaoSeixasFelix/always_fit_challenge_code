@@ -66,5 +66,3 @@ comments (id, tarefa_id, usuário_id, conteúdo, data de criação)
 notifications (id, usuário_id, mensagem, lida, data de criação)
 Autenticação
 A aplicação utiliza autenticação JWT (JSON Web Tokens) para gerenciar a autenticação e autorização dos usuários.
-
-
