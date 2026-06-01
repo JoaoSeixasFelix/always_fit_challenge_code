@@ -15,6 +15,7 @@
                         </th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
                             Descrição</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
                         <th class="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Ações
                         </th>
                     </tr>
@@ -25,6 +26,7 @@
                         <td class="border border-gray-300 px-4 py-2 text-sm text-gray-700">{{ task.id }}</td>
                         <td class="border border-gray-300 px-4 py-2 text-sm text-gray-700">{{ task.title }}</td>
                         <td class="border border-gray-300 px-4 py-2 text-sm text-gray-700">{{ task.description }}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-sm text-gray-700">{{ task.status }}</td>
                         <td class="border border-gray-300 px-4 py-2">
                             <button @click="editTask(task.id)"
                                 class="bg-yellow-500 text-white px-2 py-1 rounded mr-2">Editar</button>
