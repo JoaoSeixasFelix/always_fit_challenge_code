@@ -247,3 +247,130 @@ describe('TaskList.vue › integração com a API', () => {
     }
   )
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BLOCO 2 — Status na Tabela: Coluna e Exibição
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('TaskList.vue › coluna Status na tabela', () => {
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+
+    // Resposta com tarefas que incluem campo status
+    axiosMock.get.mockResolvedValue({
+      data: [
+        { id: 30, title: 'Task 1', description: 'Desc 1', status: 'pending' },
+        { id: 31, title: 'Task 2', description: 'Desc 2', status: 'in_progress' },
+        { id: 32, title: 'Task 3', description: 'Desc 3', status: 'completed' }
+      ]
+    })
+
+    axiosMock.delete.mockResolvedValue({ data: null })
+  })
+
+  // ── AC-LIST-1 [P3] ──────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Sem coluna "Status" na tabela
+  // PASSARÁ após o fix: <th> com texto "Status" existe no cabeçalho
+  it(
+    'AC-LIST-1 [P3] tabela deve possuir um <th> com o texto "Status" no cabeçalho',
+    async () => {
+      const mockRouterPush = vi.fn()
+      const wrapper = mount(TaskList, {
+        global: {
+          mocks: { $router: { push: mockRouterPush } }
+        }
+      })
+      await flushPromises()
+
+      // Encontra a tabela e seu cabeçalho
+      const table = wrapper.find('table')
+      expect(table.exists()).toBe(true)
+
+      // Procura por <th> com texto "Status"
+      const headers = wrapper.findAll('th')
+      const statusHeader = headers.find(th => th.text().toLowerCase().includes('status'))
+
+      expect(statusHeader).toBeDefined()
+      expect(statusHeader.exists()).toBe(true)
+    }
+  )
+
+  // ── AC-LIST-2 [P3] ──────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Sem exibição de status em cada linha
+  // PASSARÁ após o fix: Cada linha da tabela exibe o valor de status da tarefa
+  it(
+    'AC-LIST-2 [P3] cada linha da tabela deve exibir o valor do campo status da tarefa',
+    async () => {
+      const mockRouterPush = vi.fn()
+      const wrapper = mount(TaskList, {
+        global: {
+          mocks: { $router: { push: mockRouterPush } }
+        }
+      })
+      await flushPromises()
+
+      // Verifica se os dados foram carregados
+      const tasks = wrapper.vm.tasks
+      expect(tasks.length).toBeGreaterThan(0)
+
+      // Procura pelo status de cada tarefa no HTML
+      const html = wrapper.html()
+
+      // Cada status deve estar presente no render
+      tasks.forEach(task => {
+        if (task.status) {
+          // Procura pela versão em português/traduzida ou pelo valor original
+          const statusText =
+            task.status === 'pending' ? ('pendente' || task.status) :
+            task.status === 'in_progress' ? ('em andamento' || task.status) :
+            task.status === 'completed' ? ('concluída' || task.status) :
+            task.status
+
+          // Verifica se o status está presente no DOM (exibido em alguma célula)
+          const statusCell = wrapper.find(`td:contains("${statusText}"), td`)
+          
+          // Alternativamente, verifica se o status está em alguma <td>
+          const cells = wrapper.findAll('td')
+          const hasStatus = cells.some(cell => {
+            const cellText = cell.text()
+            return (
+              cellText.includes(task.status) ||
+              cellText.includes(statusText) ||
+              cellText.toLowerCase().includes(task.status.toLowerCase())
+            )
+          })
+
+          expect(hasStatus).toBe(true)
+        }
+      })
+
+      // Verificação adicional: status específicos devem estar no render
+      // (pelo menos um de cada tipo, se existirem na lista)
+      const html_lower = html.toLowerCase()
+      const statusValues = tasks.map(t => t.status)
+      
+      if (statusValues.includes('pending')) {
+        const hasPendingText = 
+          html.includes('pending') ||
+          html_lower.includes('pendente')
+        expect(hasPendingText).toBe(true)
+      }
+      
+      if (statusValues.includes('in_progress')) {
+        const hasInProgressText =
+          html.includes('in_progress') ||
+          html_lower.includes('em andamento')
+        expect(hasInProgressText).toBe(true)
+      }
+
+      if (statusValues.includes('completed')) {
+        const hasCompletedText =
+          html.includes('completed') ||
+          html_lower.includes('concluída')
+        expect(hasCompletedText).toBe(true)
+      }
+    }
+  )
+})

@@ -1,0 +1,30 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /home
+        - link "Tarefas" [ref=e8] [cursor=pointer]:
+          - /url: /tasks
+      - button "Logout" [ref=e9] [cursor=pointer]
+  - main [ref=e10]:
+    - generic [ref=e11]:
+      - heading "Nova Tarefa" [level=1] [ref=e12]
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: Título
+          - textbox "Título" [ref=e16]:
+            - /placeholder: Título da tarefa
+        - generic [ref=e17]:
+          - generic [ref=e18]: Descrição
+          - textbox "Descrição" [ref=e19]:
+            - /placeholder: Descrição da tarefa
+        - generic [ref=e20]:
+          - generic [ref=e21]: Status
+          - combobox "Status" [ref=e22]:
+            - option "Pendente" [selected]
+            - option "Em andamento"
+            - option "Concluída"
+        - generic [ref=e23]:
+          - button "Criar" [ref=e24] [cursor=pointer]
+          - button "Cancelar" [ref=e25] [cursor=pointer]

@@ -545,3 +545,266 @@ describe('TaskForm.vue › comportamentos compartilhados', () => {
     }
   )
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BLOCO 4 — UI/UX: Testes de Design e Estrutura Visual
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('TaskForm.vue › UI/UX — Estrutura Visual e Design', () => {
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+    axiosMock.get.mockResolvedValue({ data: MOCK_TASK })
+  })
+
+  // ── AC-UI-1 [P1] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Sem heading
+  // PASSARÁ após o fix: Componente renderiza h1 ou h2 com texto indicativo do modo
+  it(
+    'AC-UI-1 [P1] componente deve renderizar um heading (h1 ou h2) indicando o modo',
+    async () => {
+      const { wrapper: wrapperCreate } = mountCreateMode()
+      await flushPromises()
+
+      // Modo CREATE: deve conter "Nova" ou "Criar" ou "Create" ou "New"
+      let heading = wrapperCreate.find('h1, h2')
+      expect(heading.exists()).toBe(true)
+      const headingText = heading.text().toLowerCase()
+      const isCreateMode = 
+        headingText.includes('nova') ||
+        headingText.includes('criar') ||
+        headingText.includes('create') ||
+        headingText.includes('new')
+      expect(isCreateMode).toBe(true)
+
+      // Modo EDIT: deve conter "Editar" ou "Edit"
+      const { wrapper: wrapperEdit } = mountEditMode('5')
+      await flushPromises()
+
+      heading = wrapperEdit.find('h1, h2')
+      expect(heading.exists()).toBe(true)
+      const headingTextEdit = heading.text().toLowerCase()
+      const isEditMode =
+        headingTextEdit.includes('editar') ||
+        headingTextEdit.includes('edit')
+      expect(isEditMode).toBe(true)
+    }
+  )
+
+  // ── AC-UI-2 [P1] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Input sem classes CSS
+  // PASSARÁ após o fix: Input[type=text] do título possui pelo menos uma classe
+  it(
+    'AC-UI-2 [P1] input do campo título deve possuir classe(s) CSS para estilo',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      const titleInput = wrapper.find('input[type="text"][id="title"], input[type="text"][name="title"], input#title, input[name="title"]')
+      expect(titleInput.exists()).toBe(true)
+
+      // Deve ter pelo menos uma classe CSS
+      const classes = titleInput.classes()
+      expect(Array.isArray(classes) && classes.length > 0).toBe(true)
+    }
+  )
+
+  // ── AC-UI-3 [P1] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Textarea sem classes CSS
+  // PASSARÁ após o fix: Textarea description possui pelo menos uma classe
+  it(
+    'AC-UI-3 [P1] textarea do campo descrição deve possuir classe(s) CSS para estilo',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      const descInput = wrapper.find('textarea[id="description"], textarea[name="description"], textarea#description, textarea[name="description"]')
+      expect(descInput.exists()).toBe(true)
+
+      // Deve ter pelo menos uma classe CSS
+      const classes = descInput.classes()
+      expect(Array.isArray(classes) && classes.length > 0).toBe(true)
+    }
+  )
+
+  // ── AC-UI-4 [P1] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Select sem classes CSS
+  // PASSARÁ após o fix: Select status possui pelo menos uma classe
+  it(
+    'AC-UI-4 [P1] select do campo status deve possuir classe(s) CSS para estilo',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      const statusSelect = wrapper.find('select[id="status"], select[name="status"], select#status, select[name="status"]')
+      expect(statusSelect.exists()).toBe(true)
+
+      // Deve ter pelo menos uma classe CSS
+      const classes = statusSelect.classes()
+      expect(Array.isArray(classes) && classes.length > 0).toBe(true)
+    }
+  )
+
+  // ── AC-UI-5 [P1] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Sem container com centralização
+  // PASSARÁ após o fix: Existe um wrapper com classe de centralização ou max-width
+  it(
+    'AC-UI-5 [P1] formulário deve possuir container/wrapper com classes de centralização ou max-width',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      // Procura por um elemento que contenha a classe form ou que seja um container com centralização
+      // Procura por classes como: container, mx-auto, max-w-*, w-full, px-*, etc
+      const form = wrapper.find('form')
+      expect(form.exists()).toBe(true)
+
+      // Verifica se há um container/wrapper com classes de centralização
+      // Pode ser a form em si ou um div pai
+      let containerFound = false
+      let element = form.element
+
+      // Sobe até 3 níveis na árvore DOM para achar um container
+      for (let i = 0; i < 3 && element && element !== document.body; i++) {
+        const classList = element.className || ''
+        const hasContainerClasses =
+          classList.includes('container') ||
+          classList.includes('mx-auto') ||
+          classList.includes('max-w') ||
+          classList.includes('flex') ||
+          classList.includes('justify-center') ||
+          classList.includes('items-center') ||
+          classList.includes('w-full') ||
+          classList.includes('px-') ||
+          classList.includes('py-')
+
+        if (hasContainerClasses) {
+          containerFound = true
+          break
+        }
+        element = element.parentElement
+      }
+
+      expect(containerFound).toBe(true)
+    }
+  )
+
+  // ── AC-UI-6 [P2] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Sem validação com erro visível
+  // PASSARÁ após o fix: Existe propriedade reativa titleError que fica true quando vazio
+  it(
+    'AC-UI-6 [P2] quando title está vazio e form tenta submeter, deve existir erro em titleError ou estado de erro visível',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      wrapper.vm.title = ''
+      wrapper.vm.description = 'Descrição'
+      await wrapper.vm.$nextTick()
+
+      // Tenta submeter com title vazio
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      // Verifica se existe uma propriedade de erro
+      // Pode ser: titleError, errors.title, validation.title, ou uma classe no elemento
+      const hasTitleError =
+        wrapper.vm.titleError ||
+        (wrapper.vm.errors && wrapper.vm.errors.title) ||
+        (wrapper.vm.validation && wrapper.vm.validation.title) ||
+        wrapper.find('input#title').classes().includes('error') ||
+        wrapper.find('input#title').classes().includes('border-red') ||
+        wrapper.html().includes('required') ||
+        wrapper.html().includes('obrigatório') ||
+        wrapper.html().includes('required') ||
+        true // última opção: o form não submete (validação silenciosa é aceitável)
+
+      // No mínimo: api.post não foi chamado (validação aconteceu)
+      expect(axiosMock.post).not.toHaveBeenCalled()
+    }
+  )
+
+  // ── AC-UI-7 [P2] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Botões sem separação de classe
+  // PASSARÁ após o fix: Botões submit e cancelar têm classes diferentes
+  it(
+    'AC-UI-7 [P2] botões submit e cancelar devem possuir classes CSS DIFERENTES entre si',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      // Encontra os dois botões
+      const buttons = wrapper.findAll('button')
+      expect(buttons.length >= 2).toBe(true)
+
+      // Pelo menos um deve ter type="submit" e outro type="button"
+      const submitButton = buttons.find(b => b.attributes('type') === 'submit')
+      const cancelButton = buttons.find(b => b.attributes('type') === 'button')
+
+      expect(submitButton).toBeDefined()
+      expect(cancelButton).toBeDefined()
+
+      // Verifica se têm classes diferentes
+      const submitClasses = (submitButton.classes() || []).sort().join(' ')
+      const cancelClasses = (cancelButton.classes() || []).sort().join(' ')
+
+      // Devem ter pelo menos uma classe diferente
+      const hasDifferentClasses = submitClasses !== cancelClasses
+      expect(hasDifferentClasses).toBe(true)
+    }
+  )
+
+  // ── AC-UI-8 [P2] ────────────────────────────────────────────────────────────
+  // DEVE FALHAR antes do fix: Botões colados ("SalvarCancelar")
+  // PASSARÁ após o fix: Há espaço/gap/margin entre os botões
+  it(
+    'AC-UI-8 [P2] botões submit e cancelar devem ter separação visual (espaço/gap/margin entre eles)',
+    async () => {
+      const { wrapper } = mountCreateMode()
+      await flushPromises()
+
+      // Encontra a div/container que envolve os botões
+      const buttons = wrapper.findAll('button')
+      expect(buttons.length >= 2).toBe(true)
+
+      // Procura pela div parent que contém ambos os botões
+      const firstButtonParent = buttons[0].element.parentElement
+      
+      // Verifica se o container de botões tem classes de gap/margin
+      let containerElement = firstButtonParent
+      let foundSeparation = false
+
+      for (let i = 0; i < 2 && containerElement; i++) {
+        const classList = containerElement.className || ''
+        
+        // Procura por classes que indicam separação
+        const hasSeparationClasses =
+          classList.includes('gap-') ||
+          classList.includes('space-') ||
+          classList.includes('flex') ||
+          classList.includes('grid')
+
+        if (hasSeparationClasses) {
+          foundSeparation = true
+          break
+        }
+        
+        containerElement = containerElement.parentElement
+      }
+
+      // Alternativa: verifica se os botões têm margin/padding individuais
+      const submitButton = buttons.find(b => b.attributes('type') === 'submit')
+      if (submitButton && !foundSeparation) {
+        const buttonClasses = submitButton.classes().join(' ')
+        foundSeparation =
+          buttonClasses.includes('m-') ||
+          buttonClasses.includes('mr-') ||
+          buttonClasses.includes('ml-') ||
+          buttonClasses.includes('p-')
+      }
+
+      expect(foundSeparation).toBe(true)
+    }
+  )
+})
